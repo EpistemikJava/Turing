@@ -11,6 +11,7 @@
   mhs.turing.Turing3_2.java
   Created May 11, 2012
   git version created Mar 3, 2014
+  independent git repository created Apr 6, 2015
  
 *************************************************************************************** */
 
@@ -83,7 +84,6 @@ public class Turing3_2 {
 
     /**
      * create the machine, process the command line, then start the algorithm
-     * 
      * @param args - from command line
      */
     public static void main(String[] args) {
@@ -94,7 +94,6 @@ public class Turing3_2 {
 
     /**
      * process the command line arguments and initialize the program
-     * 
      * @param args - from command line
      */
     private void setup(String[] args) {
@@ -103,25 +102,25 @@ public class Turing3_2 {
         OptionSet options = parser.parse(args);
 
         /* show help */
-        if(options.has("h")) {
-            System.out.println("\n Java implementation of the Turing machine described in 'On Computable Numbers' (1936), section 3.II,"
-                            + "\n which generates a sequence of 0's followed by an increasing number of 1's, from 0 to infinity,"
-                            + "\n i.e. 001011011101111011111... \n"
-                            + "\n Usage: java <executable> [-h] [-s [arg]] [-t <arg>] "
-                            + "\n -h to print this message."
-                            + "\n -t <int> to specify the size of the tape array (within reason)."
-                            + "\n -s [int] to have each step of the algorithm displayed, with a 2-second delay between steps,"
-                            + "\n    > the optional argument sets an alternate delay between each step, in milliseconds.\n");
+        if( options.has("h") ) {
+            //@formatter:off
+            System.out.println(
+                "\n Java implementation of the Turing machine described in 'On Computable Numbers' (1936), section 3.II,"
+                + "\n which generates a sequence of 0's followed by an increasing number of 1's, from 0 to infinity,"
+                + "\n i.e. 001011011101111011111... \n"
+                + "\n Usage: java <executable> [-h] [-s [arg]] [-t <arg>] "
+                + "\n -h to print this message."
+                + "\n -t <int> to specify the size of the tape array (within reason)."
+                + "\n -s [int] to have each step of the algorithm displayed, with a 2-second delay between steps,"
+                + "\n    > the optional argument sets an alternate delay between each step, in milliseconds.\n");
+            //@formatter:on
             /*
-                  try
-                  {
-                    parser.printHelpOn( System.out );
-                  }
-                  catch( IOException ioe )
-                  {
-                    // TODO Auto-generated catch block
-                    ioe.printStackTrace();
-                  }
+            try {
+                parser.printHelpOn( System.out );
+            }
+            catch( IOException ioe ) {
+                ioe.printStackTrace();
+            }
             */
             System.exit(0);
 
@@ -130,18 +129,18 @@ public class Turing3_2 {
         step_delay = DEFAULT_DELAY_MS;
 
         /* use -s [delay] to show each step and optionally specify a delay interval by entering an integer argument */
-        if(options.has("s")) {
+        if( options.has("s") ) {
             show_steps = true;
 
             // use "-" for blank squares to see each step more clearly
             STR_SYMBOLS[nBLANK] = "-";
 
-            if(options.hasArgument("s")) {
+            if( options.hasArgument("s") ) {
                 step_delay = Integer.valueOf((String) options.valueOf("s"));
-                if(step_delay < MIN_DELAY_MS) {
+                if( step_delay < MIN_DELAY_MS ) {
                     System.out.println("\n\t>>> MINIMUM value for the step delay is " + MIN_DELAY_MS + ". <<<");
                     step_delay = MIN_DELAY_MS;
-                } else if(step_delay > MAX_DELAY_MS) {
+                } else if( step_delay > MAX_DELAY_MS ) {
                     System.out.println("\n\t>>> MAXIMUM value for the step delay is " + MAX_DELAY_MS + ". <<<");
                     step_delay = MAX_DELAY_MS;
                 }
@@ -151,12 +150,12 @@ public class Turing3_2 {
         tape_size = DEFAULT_TAPE_SIZE;
 
         /* use -t <tape_size> to request a particular array (tape) size */
-        if(options.has("t")) {
+        if( options.has("t") ) {
             tape_size = Integer.valueOf((String) options.valueOf("t"));
-            if(tape_size < MIN_TAPE_SIZE) {
+            if( tape_size < MIN_TAPE_SIZE ) {
                 tape_size = MIN_TAPE_SIZE;
                 System.out.println("\n\t>>> MINIMUM value for the tape size is " + MIN_TAPE_SIZE + ". <<<");
-            } else if(tape_size > MAX_TAPE_SIZE) {
+            } else if( tape_size > MAX_TAPE_SIZE ) {
                 tape_size = MAX_TAPE_SIZE;
                 System.out.println("\n\t>>> MAXIMUM value for the tape size is " + MAX_TAPE_SIZE + ". <<<");
             }
@@ -166,8 +165,7 @@ public class Turing3_2 {
 
         state = STATE_BEGIN;
         position = 0;
-
-    }// setup()
+    }
 
     /**
      * run the algorithm:<br>
@@ -192,34 +190,34 @@ public class Turing3_2 {
             step++;
             location = ar_tape[position];
 
-            if(show_steps) show_step(step);
+            if( show_steps ) show_step(step);
 
-            switch(state) {
+            switch( state ) {
             case STATE_PRINT_X:
-                if(location == nONE) {
+                if( location == nONE ) {
                     move_right();
                     set(nX);
                     move_left(3);
-                } else if(location == nZERO) {
+                } else if( location == nZERO ) {
                     state = STATE_PRINT_1;
                 }
                 break;
 
             case STATE_ERASE_X:
-                if(location == nX) {
+                if( location == nX ) {
                     erase();
                     move_right();
                     state = STATE_PRINT_1;
-                } else if(location == nSCHWA) {
+                } else if( location == nSCHWA ) {
                     move_right();
                     state = STATE_PRINT_0;
-                } else if(location == nBLANK) {
+                } else if( location == nBLANK ) {
                     move_left(2);
                 }
                 break;
 
             case STATE_PRINT_0:
-                if(location == nBLANK) {
+                if( location == nBLANK ) {
                     set(nZERO);
                     move_left(2);
                     state = STATE_PRINT_X;
@@ -229,7 +227,7 @@ public class Turing3_2 {
                 break;
 
             case STATE_PRINT_1:
-                if(location == nBLANK) {
+                if( location == nBLANK ) {
                     set(nONE);
                     move_left();
                     state = STATE_ERASE_X;
@@ -244,19 +242,16 @@ public class Turing3_2 {
             }// switch
 
         }// do
-        while(position < tape_size);
+        while( position < tape_size );
 
         end();
+    }
 
-    }// generate()
-
-    /**
-     * the actions of the initial state of the algorithm -- NEVER return to this state again
-     */
+    /** the actions of the initial state of the algorithm -- NEVER return to this state again */
     private void begin() {
-        if(state != STATE_BEGIN) return;
+        if( state != STATE_BEGIN ) return;
 
-        if(show_steps) show_step(0);
+        if( show_steps ) show_step(0);
 
         set(nSCHWA);
         move_right();
@@ -272,7 +267,6 @@ public class Turing3_2 {
 
     /**
      * set the specified symbol on the tape at the current position
-     * 
      * @param i - symbol to set
      */
     private void set(int i) {
@@ -291,14 +285,13 @@ public class Turing3_2 {
 
     /**
      * move right by the specified number of squares - not in Turing's description but more convenient
-     * 
      * @param count - number of squares to move to the right
      */
     private void move_right(int count) {
         position += count;
 
         /* end program when position moves beyond the end of the array */
-        if(position >= tape_size) {
+        if( position >= tape_size ) {
             System.out.println("Position is " + position + ".");
             end();
         }
@@ -311,14 +304,13 @@ public class Turing3_2 {
 
     /**
      * move left by the specified number of squares - not in Turing's description but more convenient
-     * 
      * @param count - number of squares to move to the left
      */
     private void move_left(int count) {
         position -= count;
 
         /* return to 0 if move before the start of the array -- SHOULD NEVER HAPPEN */
-        if(position < 0) {
+        if( position < 0 ) {
             System.out.println("WARNING: Position: [" + position + "] is less than 0 !");
             position = 0;
         }
@@ -328,7 +320,7 @@ public class Turing3_2 {
      * display the sequence of symbols on the tape, then exit.
      */
     private void end() {
-        if(!show_steps) {
+        if( !show_steps ) {
             printTape();
         }
 
@@ -340,7 +332,7 @@ public class Turing3_2 {
      * display the sequence of symbols on the tape
      */
     private void printTape() {
-        for(int posn : ar_tape) {
+        for( int posn : ar_tape ) {
             printSymbol(posn, true);
         }
         System.out.println("E");
@@ -348,12 +340,11 @@ public class Turing3_2 {
 
     /**
      * display the symbol used for different types of <code>position</code> on the tape to stdout
-     * 
      * @param posn - position on the tape to display
      * @param newline - new line starting at each 'zero'
      */
     private void printSymbol(int posn, boolean newline) {
-        switch(posn) {
+        switch( posn ) {
         case nBLANK:
             System.out.print(STR_SYMBOLS[nBLANK]);
             break;
@@ -367,7 +358,7 @@ public class Turing3_2 {
             break;
 
         case nZERO:
-            if(newline) System.out.println();
+            if( newline ) System.out.println();
             System.out.print(STR_SYMBOLS[nZERO]);
             break;
 
@@ -382,7 +373,6 @@ public class Turing3_2 {
 
     /**
      * display the step sequence and machine state at a particular point in the program
-     *
      * @param step - current count in the series of instructions
      */
     private void show_step(int step) {
@@ -395,7 +385,7 @@ public class Turing3_2 {
         // pause to allow easier inspection of each step
         try {
             Thread.sleep(step_delay); // milliseconds
-        } catch(InterruptedException ie) {
+        } catch( InterruptedException ie ) {
             ie.printStackTrace();
         }
     }
