@@ -1,6 +1,10 @@
 /doc
-/javadoc.xml
+/out*
 /bin
-/.classpath
-/.project
-/.settings/
+*.class
+*.out
+*.zip
+/bak
+/BAK
+/ark
+/ARK
