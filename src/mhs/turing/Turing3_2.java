@@ -27,7 +27,8 @@ import joptsimple.OptionSet;
  * See also <i>The Annotated Turing</i> by <b>Charles Petzold</b>; Chapter 5, pp.85-94.
  * 
  * @author mhsatto
- * @version 1.4.5
+ * @version 1.5.0
+ * @date 2018-10-21
  * 
  */
 public class Turing3_2 {
@@ -35,31 +36,34 @@ public class Turing3_2 {
     private int state;
     /** current position on the 'tape' */
     private int position;
-
+    
     /** use an array as a substitute for the <em>infinite</em> tape */
     private int[] ar_tape;
     /** size of the 'tape' array */
     private int tape_size;
-
+    
     /** number of 'squares' available on the 'tape' */
     final static int DEFAULT_TAPE_SIZE = 256;
     /** MAXIMUM number of 'squares' available on the 'tape' */
     final static int MAX_TAPE_SIZE = 1024 * 16;
     /** MINIMUM number of 'squares' available on the 'tape' */
     final static int MIN_TAPE_SIZE = 16;
-
+    
     /** determine whether each step is displayed */
     private boolean show_steps;
     /** delay, in milliseconds, between each step display */
     private int step_delay;
-
+    
     /** if displaying each step of the algorithm, DEFAULT delay (in msec) between each step */
     final static int DEFAULT_DELAY_MS = 2000;
     /** if displaying each step of the algorithm, MINIMUM delay (in msec) between each step */
     final static int MIN_DELAY_MS = 5;
     /** if displaying each step of the algorithm, MAXIMUM delay (in msec) between each step */
-    final static int MAX_DELAY_MS = 1000 * 60 * 60;
-
+    final static int MAX_DELAY_MS = 1000 * 60;
+    
+    /** determine whether print 'new-line' starting at each zero */
+    private boolean show_newline;
+    
     //@formatter:off
     /** tape symbol */
     final static int nBLANK = 0, // nBLANK = 0 so tape array is initialized by default to all blanks
@@ -67,10 +71,15 @@ public class Turing3_2 {
                      nONE   = 2,
                      nX     = 3,
                      nSCHWA = 4;
-
+    
     /** symbols to display */
-    static String[] STR_SYMBOLS = { " ", "0", "1", "x", "@" };
-
+    static String[] STR_SYMBOLS = { "" , // nBLANK
+                                    "0", // nZERO
+                                    "1", // nONE
+                                    "x", // nX
+                                    "@"  // nSCHWA
+                                  };
+        
     /** machine state */
     final static int STATE_BEGIN   = 0,
                      STATE_PRINT_X = 1,
@@ -98,7 +107,7 @@ public class Turing3_2 {
      */
     private void setup(String[] args) {
         // -h for help, -s [arg] for steps, -t <arg> for tape size
-        OptionParser parser = new OptionParser("h*s::t:");
+        OptionParser parser = new OptionParser("h*s::t:n*");
         OptionSet options = parser.parse(args);
 
         /* show help */
@@ -108,11 +117,12 @@ public class Turing3_2 {
                 "\n Java implementation of the Turing machine described in 'On Computable Numbers' (1936), section 3.II,"
                 + "\n which generates a sequence of 0's followed by an increasing number of 1's, from 0 to infinity,"
                 + "\n i.e. 001011011101111011111... \n"
-                + "\n Usage: java <executable> [-h] [-s [arg]] [-t <arg>] "
+                + "\n Usage: java <class-file> [-h] [-s [arg]] [-t <arg>] "
                 + "\n -h to print this message."
                 + "\n -t <int> to specify the size of the tape array (within reason)."
                 + "\n -s [int] to have each step of the algorithm displayed, with a 2-second delay between steps,"
-                + "\n    > the optional argument sets an alternate delay between each step, in milliseconds.\n");
+                + "\n    > the optional argument sets an alternate delay between each step, in milliseconds."
+                + "\n -n to start a new line at each zero.\n");
             //@formatter:on
             /*
             try {
@@ -161,6 +171,11 @@ public class Turing3_2 {
             }
         }// -t
 
+        /* use -n to print a 'new-line' starting at each zero */
+        if( options.has("n") ) {
+            show_newline = true;
+        }// -n
+
         ar_tape = new int[tape_size];
 
         state = STATE_BEGIN;
@@ -179,8 +194,8 @@ public class Turing3_2 {
         int location;
         int step = 0;
 
-        System.out.println("\n Size of tape array is " + ar_tape.length);
-        System.out.println(show_steps ? " Step delay is " + step_delay + "\n" : ".");
+        System.out.print("\nSize of tape array is " + ar_tape.length);
+        System.out.println(show_steps ? ".\nStep delay is " + step_delay + ".\n" : ".");
 
         // initial state
         begin();
@@ -292,7 +307,7 @@ public class Turing3_2 {
 
         /* end program when position moves beyond the end of the array */
         if( position >= tape_size ) {
-            System.out.println("Position is " + position + ".");
+            System.out.println("Reached final position # " + position + " >> ENDING PROGRAM.\n");
             end();
         }
     }
@@ -333,7 +348,7 @@ public class Turing3_2 {
      */
     private void printTape() {
         for( int posn : ar_tape ) {
-            printSymbol(posn, true);
+            printSymbol(posn, show_newline);
         }
         System.out.println("E");
     }
