@@ -12,7 +12,17 @@
   Created May 11, 2012
   git version created Mar 3, 2014
   independent git repository created Apr 6, 2015
- 
+  
+  from folder .../Turing:
+  
+   Compile
+  ---------
+  javac -cp jars/jopt-simple-4.6.jar -d bin -deprecation src/mhs/turing/Turing3_2.java
+
+   Run
+  -----
+  java -cp jars/jopt-simple-4.6.jar:bin mhs.turing.Turing3_2
+
 *************************************************************************************** */
 
 package mhs.turing;
@@ -207,8 +217,8 @@ public class Turing3_2 {
 
             if( show_steps ) show_step(step);
 
-            switch( state ) {
-            case STATE_PRINT_X:
+            switch(state) {
+              case STATE_PRINT_X:
                 if( location == nONE ) {
                     move_right();
                     set(nX);
@@ -217,8 +227,8 @@ public class Turing3_2 {
                     state = STATE_PRINT_1;
                 }
                 break;
-
-            case STATE_ERASE_X:
+            
+              case STATE_ERASE_X:
                 if( location == nX ) {
                     erase();
                     move_right();
@@ -230,8 +240,8 @@ public class Turing3_2 {
                     move_left(2);
                 }
                 break;
-
-            case STATE_PRINT_0:
+            
+              case STATE_PRINT_0:
                 if( location == nBLANK ) {
                     set(nZERO);
                     move_left(2);
@@ -240,14 +250,14 @@ public class Turing3_2 {
                     move_right(2);
                 }
                 break;
-
-            case STATE_PRINT_1:
+            
+              case STATE_PRINT_1:
                 if( location == nBLANK ) {
                     set(nONE);
                     move_left();
                     state = STATE_ERASE_X;
-                } else // if( (location == nZERO) || (location == nONE) )
-                {
+                } else {
+                    // location == nZERO || location == nONE
                     move_right(2);
                 }
                 break;
@@ -359,29 +369,29 @@ public class Turing3_2 {
      * @param newline - new line starting at each 'zero'
      */
     private void printSymbol(int posn, boolean newline) {
-        switch( posn ) {
-        case nBLANK:
+        switch(posn) {
+          case nBLANK:
             System.out.print(STR_SYMBOLS[nBLANK]);
             break;
-
-        case nSCHWA:
+        
+          case nSCHWA:
             System.out.print(STR_SYMBOLS[nSCHWA]);
             break;
-
-        case nX:
+        
+          case nX:
             System.out.print(STR_SYMBOLS[nX]);
             break;
-
-        case nZERO:
+        
+          case nZERO:
             if( newline ) System.out.println();
             System.out.print(STR_SYMBOLS[nZERO]);
             break;
-
-        case nONE:
+        
+          case nONE:
             System.out.print(STR_SYMBOLS[nONE]);
             break;
-
-        default:
+        
+          default:
             throw new IllegalStateException("\n\t>> Current symbol is '" + posn + "'?!");
         }
     }
@@ -399,7 +409,7 @@ public class Turing3_2 {
 
         // pause to allow easier inspection of each step
         try {
-            Thread.sleep(step_delay); // milliseconds
+             Thread.sleep(step_delay); // milliseconds
         } catch( InterruptedException ie ) {
             ie.printStackTrace();
         }
