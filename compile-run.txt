@@ -1,0 +1,8 @@
+﻿
+  compile:
+-----------
+  javac -cp jars/jopt-simple-4.6.jar -d bin -deprecation src/mhs/turing/Turing3_2.java
+
+    run:
+-----------
+  java -cp bin:jars/jopt-simple-4.6.jar mhs/turing/Turing3_2
