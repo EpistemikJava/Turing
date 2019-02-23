@@ -49,8 +49,6 @@ public class Turing3_2 {
     
     /** use an array as a substitute for the <em>infinite</em> tape */
     private int[] ar_tape;
-    /** size of the 'tape' array */
-    private int tape_size;
     
     /** number of 'squares' available on the 'tape' */
     final static int DEFAULT_TAPE_SIZE = 256;
@@ -59,17 +57,21 @@ public class Turing3_2 {
     /** MINIMUM number of 'squares' available on the 'tape' */
     final static int MIN_TAPE_SIZE = 16;
     
-    /** determine whether each step is displayed */
-    private boolean show_steps;
-    /** delay, in milliseconds, between each step display */
-    private int step_delay;
-    
     /** if displaying each step of the algorithm, DEFAULT delay (in msec) between each step */
     final static int DEFAULT_DELAY_MS = 2000;
     /** if displaying each step of the algorithm, MINIMUM delay (in msec) between each step */
     final static int MIN_DELAY_MS = 5;
     /** if displaying each step of the algorithm, MAXIMUM delay (in msec) between each step */
     final static int MAX_DELAY_MS = 1000 * 60;
+    
+    /** determine whether each step is displayed */
+    private boolean show_steps;
+    /** delay, in milliseconds, between each step display */
+    private int step_delay = DEFAULT_DELAY_MS;
+    /** default tape array size */
+    private boolean tape_default = true;
+    /** size of the 'tape' array */
+    private int tape_size = DEFAULT_TAPE_SIZE;
     
     /** determine whether print 'new-line' starting at each zero */
     private boolean show_newline;
@@ -116,8 +118,15 @@ public class Turing3_2 {
      * @param args - from command line
      */
     private void setup(String[] args) {
-        // -h for help, -s [arg] for steps, -t <arg> for tape size
-        OptionParser parser = new OptionParser("h*s::t:n*");
+        // -h for help, -s [arg] for steps, -t <arg> for tape size, -n for newline, -x for nice example run
+        /*
+        Short options can accept single arguments. The argument can be made required or optional. 
+        When you construct an OptionParser with a string of short option characters, 
+        append a single colon (:) to an option character to configure that option to require an argument. 
+        Append two colons (::) to an option character to configure that option to accept an optional argument. 
+        Append an asterisk (*) to an option character, but before any "argument" indicators, to configure that option as a "help" option.
+        */
+        OptionParser parser = new OptionParser("h*s::t:nx");
         OptionSet options = parser.parse(args);
 
         /* show help */
@@ -130,9 +139,10 @@ public class Turing3_2 {
                 + "\n Usage: java <class-file> [-h] [-s [arg]] [-t <arg>] "
                 + "\n -h to print this message."
                 + "\n -t <int> to specify the size of the tape array (within reason)."
-                + "\n -s [int] to have each step of the algorithm displayed, with a 2-second delay between steps,"
-                + "\n    > the optional argument sets an alternate delay between each step, in milliseconds."
-                + "\n -n to start a new line at each zero.\n");
+                + "\n -s [int] to have each step of the algorithm displayed with a 2-second pause between steps,"
+                + "\n    > use the optional argument to set the pause between each step, in milliseconds."
+                + "\n -n to start a new line with each zero."
+                + "\n -x to run a nice example = [-n -t 602]\n");
             //@formatter:on
             /*
             try {
@@ -146,8 +156,6 @@ public class Turing3_2 {
 
         }// -h
 
-        step_delay = DEFAULT_DELAY_MS;
-
         /* use -s [delay] to show each step and optionally specify a delay interval by entering an integer argument */
         if( options.has("s") ) {
             show_steps = true;
@@ -155,6 +163,7 @@ public class Turing3_2 {
             // use "-" for blank squares to see each step more clearly
             STR_SYMBOLS[nBLANK] = "-";
 
+            // check for optional argument
             if( options.hasArgument("s") ) {
                 step_delay = Integer.valueOf((String) options.valueOf("s"));
                 if( step_delay < MIN_DELAY_MS ) {
@@ -167,8 +176,6 @@ public class Turing3_2 {
             }
         }// -s
 
-        tape_size = DEFAULT_TAPE_SIZE;
-
         /* use -t <tape_size> to request a particular array (tape) size */
         if( options.has("t") ) {
             tape_size = Integer.valueOf((String) options.valueOf("t"));
@@ -179,12 +186,20 @@ public class Turing3_2 {
                 tape_size = MAX_TAPE_SIZE;
                 System.out.println("\n\t>>> MAXIMUM value for the tape size is " + MAX_TAPE_SIZE + ". <<<");
             }
+            tape_default = false;
         }// -t
 
         /* use -n to print a 'new-line' starting at each zero */
         if( options.has("n") ) {
             show_newline = true;
         }// -n
+
+        /* use -x to run a nice example */
+        if( options.has("x") ) {
+            tape_size = 602;
+            tape_default = false;
+            show_newline = true;
+        }// -x
 
         ar_tape = new int[tape_size];
 
@@ -204,8 +219,8 @@ public class Turing3_2 {
         int location;
         int step = 0;
 
-        System.out.print("\nSize of tape array is " + ar_tape.length);
-        System.out.println(show_steps ? ".\nStep delay is " + step_delay + ".\n" : ".");
+        System.out.print((tape_default ? "\nUsing DEFAULT s" : "\nS") + "ize of tape array = " + ar_tape.length);
+        System.out.println(show_steps ? ".\nStep pause is " + step_delay + ".\n" : ".");
 
         // initial state
         begin();
