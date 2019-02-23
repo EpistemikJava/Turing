@@ -13,7 +13,8 @@
   git version created Mar 3, 2014
   independent git repository created Apr 6, 2015
   
-  from folder .../Turing:
+
+  from folder <...>/Java/Turing:
   
    Compile
   ---------
@@ -37,9 +38,8 @@ import joptsimple.OptionSet;
  * See also <i>The Annotated Turing</i> by <b>Charles Petzold</b>; Chapter 5, pp.85-94.
  * 
  * @author mhsatto
- * @version 1.5.0
- * @date 2018-10-21
- * 
+ * @version 1.5.1
+ * @date 2019-02-23
  */
 public class Turing3_2 {
     /** current state of the machine */
@@ -84,7 +84,7 @@ public class Turing3_2 {
                      nX     = 3,
                      nSCHWA = 4;
     
-    /** symbols to display */
+    /** symbols to display -- order MUST MATCH the values for the tape symbol ints */
     static String[] STR_SYMBOLS = { "" , // nBLANK
                                     "0", // nZERO
                                     "1", // nONE
@@ -100,7 +100,7 @@ public class Turing3_2 {
                      STATE_PRINT_1 = 4;
     //@formatter:on
 
-    /** state names for display */
+    /** state names for display -- order MUST MATCH the values for the machine state ints */
     final static String[] STR_STATES = { "STATE_BEGIN", "STATE_PRINT_X", "STATE_ERASE_X", "STATE_PRINT_0", "STATE_PRINT_1" };
 
     /**
@@ -115,10 +115,10 @@ public class Turing3_2 {
 
     /**
      * process the command line arguments and initialize the program
+     *   <code>OptionParser</code> options: -h for help, -s [arg] for steps, -t <arg> for tape size, -n for newline, -x for nice example run
      * @param args - from command line
      */
     private void setup(String[] args) {
-        // -h for help, -s [arg] for steps, -t <arg> for tape size, -n for newline, -x for nice example run
         /*
         Short options can accept single arguments. The argument can be made required or optional. 
         When you construct an OptionParser with a string of short option characters, 
@@ -142,7 +142,7 @@ public class Turing3_2 {
                 + "\n -s [int] to have each step of the algorithm displayed with a 2-second pause between steps,"
                 + "\n    > use the optional argument to set the pause between each step, in milliseconds."
                 + "\n -n to start a new line with each zero."
-                + "\n -x to run a nice example = [-n -t 602]\n");
+                + "\n -x to run a nice example = [-n -t 602]\n" );
             //@formatter:on
             /*
             try {
@@ -156,7 +156,7 @@ public class Turing3_2 {
 
         }// -h
 
-        /* use -s [delay] to show each step and optionally specify a delay interval by entering an integer argument */
+        /* use -s [pause] to show each step and optionally specify a pause interval by entering an integer argument */
         if( options.has("s") ) {
             show_steps = true;
 
@@ -167,10 +167,10 @@ public class Turing3_2 {
             if( options.hasArgument("s") ) {
                 step_delay = Integer.valueOf((String) options.valueOf("s"));
                 if( step_delay < MIN_DELAY_MS ) {
-                    System.out.println("\n\t>>> MINIMUM value for the step delay is " + MIN_DELAY_MS + ". <<<");
+                    System.out.println("\n\t>>> MINIMUM value for the step pause is " + MIN_DELAY_MS + ". <<<");
                     step_delay = MIN_DELAY_MS;
                 } else if( step_delay > MAX_DELAY_MS ) {
-                    System.out.println("\n\t>>> MAXIMUM value for the step delay is " + MAX_DELAY_MS + ". <<<");
+                    System.out.println("\n\t>>> MAXIMUM value for the step pause is " + MAX_DELAY_MS + ". <<<");
                     step_delay = MAX_DELAY_MS;
                 }
             }
@@ -189,7 +189,7 @@ public class Turing3_2 {
             tape_default = false;
         }// -t
 
-        /* use -n to print a 'new-line' starting at each zero */
+        /* use -n to print a 'new-line' starting with each zero */
         if( options.has("n") ) {
             show_newline = true;
         }// -n
@@ -233,12 +233,14 @@ public class Turing3_2 {
             if( show_steps ) show_step(step);
 
             switch(state) {
+
               case STATE_PRINT_X:
                 if( location == nONE ) {
                     move_right();
                     set(nX);
                     move_left(3);
-                } else if( location == nZERO ) {
+                }
+                else if( location == nZERO ) {
                     state = STATE_PRINT_1;
                 }
                 break;
@@ -248,10 +250,12 @@ public class Turing3_2 {
                     erase();
                     move_right();
                     state = STATE_PRINT_1;
-                } else if( location == nSCHWA ) {
+                }
+                else if( location == nSCHWA ) {
                     move_right();
                     state = STATE_PRINT_0;
-                } else if( location == nBLANK ) {
+                }
+                else if( location == nBLANK ) {
                     move_left(2);
                 }
                 break;
@@ -261,7 +265,8 @@ public class Turing3_2 {
                     set(nZERO);
                     move_left(2);
                     state = STATE_PRINT_X;
-                } else {
+                }
+                else {
                     move_right(2);
                 }
                 break;
@@ -271,7 +276,8 @@ public class Turing3_2 {
                     set(nONE);
                     move_left();
                     state = STATE_ERASE_X;
-                } else {
+                }
+                else {
                     // location == nZERO || location == nONE
                     move_right(2);
                 }
@@ -287,7 +293,7 @@ public class Turing3_2 {
         end();
     }
 
-    /** the actions of the initial state of the algorithm -- NEVER return to this state again */
+    /** the actions at the INITIAL STATE of the algorithm -- NEVER return to this state again */
     private void begin() {
         if( state != STATE_BEGIN ) return;
 
@@ -306,25 +312,25 @@ public class Turing3_2 {
     }
 
     /**
-     * set the specified symbol on the tape at the current position
+     * SET the specified symbol on the tape at the current position
      * @param i - symbol to set
      */
     private void set(int i) {
         ar_tape[position] = i;
     }
 
-    /** erase the symbol at the current position */
+    /** ERASE the symbol at the current position */
     private void erase() {
         ar_tape[position] = nBLANK;
     }
 
-    /** move right on the tape by one square */
+    /** MOVE RIGHT on the tape by one square */
     private void move_right() {
         move_right(1);
     }
 
     /**
-     * move right by the specified number of squares - not in Turing's description but more convenient
+     * MOVE RIGHT by the specified number of squares - not in Turing's description but more convenient
      * @param count - number of squares to move to the right
      */
     private void move_right(int count) {
@@ -337,13 +343,13 @@ public class Turing3_2 {
         }
     }
 
-    /** move left on the tape by one square */
+    /** MOVE LEFT on the tape by one square */
     private void move_left() {
         move_left(1);
     }
 
     /**
-     * move left by the specified number of squares - not in Turing's description but more convenient
+     * MOVE LEFT by the specified number of squares - not in Turing's description but more convenient
      * @param count - number of squares to move to the left
      */
     private void move_left(int count) {
@@ -357,7 +363,7 @@ public class Turing3_2 {
     }
 
     /**
-     * display the sequence of symbols on the tape, then exit.
+     * DISPLAY the sequence of symbols on the tape, then exit.
      */
     private void end() {
         if( !show_steps ) {
@@ -369,7 +375,7 @@ public class Turing3_2 {
     }
 
     /**
-     * display the sequence of symbols on the tape
+     * DISPLAY the sequence of symbols on the tape
      */
     private void printTape() {
         for( int posn : ar_tape ) {
@@ -379,7 +385,7 @@ public class Turing3_2 {
     }
 
     /**
-     * display the symbol used for different types of <code>position</code> on the tape to stdout
+     * DISPLAY the symbol used for different types of <code>position</code> on the tape to stdout
      * @param posn - position on the tape to display
      * @param newline - new line starting at each 'zero'
      */
@@ -412,7 +418,7 @@ public class Turing3_2 {
     }
 
     /**
-     * display the step sequence and machine state at a particular point in the program
+     * DISPLAY the step sequence and machine state at a particular point in the program
      * @param step - current count in the series of instructions
      */
     private void show_step(int step) {
